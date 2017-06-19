@@ -4,11 +4,14 @@ using Microsoft.Owin.Security;
 using System;
 using System.Linq;
 using System.Web;
+using VVJ.LearningAspNetIdentity.WebForms.Services.UserService;
 
 namespace VVJ.LearningAspNetIdentity.WebForms
 {
     public partial class Register : System.Web.UI.Page
     {
+        private UserService userService = new UserService();
+
         protected void Page_Load(object sender, EventArgs e)
         {
 
@@ -16,17 +19,10 @@ namespace VVJ.LearningAspNetIdentity.WebForms
 
         protected void CreateUser_Click(object sender, EventArgs e)
         {
-            var userStore = new UserStore<IdentityUser>();
-            var manager = new UserManager<IdentityUser>(userStore);
-            var user = new IdentityUser() { UserName = UserName.Text };
-
-            var result = manager.Create(user, Password.Text);
-
+            var result = userService.CreateUser(this.UserName.Text,this.Password.Text);
             if (result.Succeeded)
             {
-                var authenticationManager = HttpContext.Current.GetOwinContext().Authentication;
-                var userIdentity = manager.CreateIdentity(user, DefaultAuthenticationTypes.ApplicationCookie);
-                authenticationManager.SignIn(new AuthenticationProperties(){ },  userIdentity);
+                userService.SingIn(userService.GetUser(UserName.Text, Password.Text));
                 Response.Redirect("~/Login.aspx");
             }
             else

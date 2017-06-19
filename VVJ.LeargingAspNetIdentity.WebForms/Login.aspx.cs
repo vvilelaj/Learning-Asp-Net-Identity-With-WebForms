@@ -7,11 +7,14 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using VVJ.LearningAspNetIdentity.WebForms.Services.UserService;
 
 namespace VVJ.LearningAspNetIdentity.WebForms
 {
     public partial class Login : System.Web.UI.Page
     {
+        private UserService userService = new UserService();
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -31,15 +34,10 @@ namespace VVJ.LearningAspNetIdentity.WebForms
 
         protected void SignIn(object sender, EventArgs e)
         {
-            var userStore = new UserStore<IdentityUser>();
-            var manager = new UserManager<IdentityUser>(userStore);
-            var user = manager.Find(UserName.Text, Password.Text);
+            var user = userService.GetUser(UserName.Text, Password.Text);
             if (user != null)
             {
-                var authenticationManager = HttpContext.Current.GetOwinContext().Authentication;
-                var userIdentity = manager.CreateIdentity(user, DefaultAuthenticationTypes.ApplicationCookie);
-                authenticationManager.SignIn(new AuthenticationProperties { IsPersistent = true }, userIdentity);
-
+                userService.SingIn(user);
                 var returnUrl = (string.IsNullOrWhiteSpace(Request.QueryString["ReturnUrl"])) ? "~/Login.aspx" : Request.QueryString["ReturnUrl"];
                 Response.Redirect(returnUrl);
             }
@@ -52,8 +50,7 @@ namespace VVJ.LearningAspNetIdentity.WebForms
 
         protected void SignOut(object sender, EventArgs e)
         {
-            var authenticationManager = HttpContext.Current.GetOwinContext().Authentication;
-            authenticationManager.SignOut();
+            userService.SingOut();
             Response.Redirect("~/Login.aspx");
         }
     }

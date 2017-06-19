@@ -34,6 +34,11 @@
                         <asp:Button runat="server" OnClick="SignIn" Text="Log in" />
                     </div>
                 </div>
+                <div style="margin-bottom: 10px">
+                    <div>
+                        <asp:HyperLink NavigateUrl="~/Register.aspx" runat="server" Text="Crear Cuenta" />
+                    </div>
+                </div>
             </asp:PlaceHolder>
             <asp:PlaceHolder runat="server" ID="LogoutButton" Visible="false">
                 <div>
